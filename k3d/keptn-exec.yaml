@@ -1,0 +1,17 @@
+apiVersion: k3d.io/v1alpha4
+kind: Simple
+metadata:
+  name: keptn-exec
+image: docker.io/rancher/k3s:v1.22.6-k3s1
+agents: 1
+network: keptn-network
+options:
+  kubeconfig:
+    switchCurrentContext: false
+  k3d:
+    disableLoadbalancer: true
+  k3s:
+    extraArgs:
+      - arg: --no-deploy=traefik,servicelb,metrics-server
+        nodeFilters:
+          - server:*

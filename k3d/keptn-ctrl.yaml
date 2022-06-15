@@ -1,0 +1,22 @@
+apiVersion: k3d.io/v1alpha4
+kind: Simple
+metadata:
+  name: keptn-ctrl
+image: docker.io/rancher/k3s:v1.22.6-k3s1
+agents: 1
+network: keptn-network
+ports:
+  - port: 8082:80
+    nodeFilters:
+      - agent:0:direct
+options:
+  kubeconfig:
+    switchCurrentContext: false
+  k3s:
+    extraArgs:
+      - arg: --kube-proxy-arg=conntrack-max-per-core=0
+        nodeFilters:
+          - server:*
+      - arg: --no-deploy=metrics-server
+        nodeFilters:
+          - server:*
