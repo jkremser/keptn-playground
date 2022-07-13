@@ -27,13 +27,13 @@ distributor:
       scopes: ""
 
 remoteControlPlane:
-  enabled: false                             # Enables remote execution plane mode
+  enabled: true                             # Enables remote execution plane mode
   api:
-    protocol: "https"                        # Used Protocol (http, https)
-    hostname: ""                             # Hostname of the control plane cluster (and Port)
-    apiValidateTls: true                     # Defines if the control plane certificate should be validated
-    token: ""                                # Keptn API Token
-    tokenSecretName:                         # Use a predefined secret ie: from sealed-secrets. Must have a config key of keptn-api-token inside the secret
+    protocol: "http"                        # Used Protocol (http, https)
+    hostname: "172.24.0.1:8082"             # Hostname of the control plane cluster (and Port)
+    apiValidateTls: false                   # Defines if the control plane certificate should be validated
+    token: ""
+    tokenSecretName:                        # Use a predefined secret ie: from sealed-secrets. Must have a config key of keptn-api-token inside the secret
 
 imagePullSecrets: []                         # Secrets to use for container registry credentials
 

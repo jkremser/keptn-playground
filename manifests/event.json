@@ -1,0 +1,26 @@
+{
+    "data": {
+      "configurationChange": {
+        "values": null
+      },
+      "deployment": {
+        "deploymentURIsLocal": null,
+        "deploymentstrategy": ""
+      },
+      "project": "jes-example",
+      "service": "hello",
+      "stage": "production",
+      "temporaryData": {
+        "distributor": {
+          "subscriptionID": ""
+        }
+      }
+    },
+    "id": "76c69906-8944-4a14-b30b-6a14238f388c",
+    "shkeptncontext": "dc4e1a1d-8c90-4163-b86a-0d630fc56a1f",
+    "shkeptnspecversion": "0.2.4",
+    "source": "shipyard-controller",
+    "specversion": "1.0",
+    "gitcommitid": "6553bb23cb6a31bd899d1e16f748ad710d913c88",
+    "type": "sh.keptn.event.remote-task.cluster-switch.triggered"
+  }

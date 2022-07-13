@@ -1,0 +1,163 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    batch.kubernetes.io/job-tracking: ""
+  name: test
+  namespace: keptn-jes
+spec:
+  backoffLimit: 0
+  manualSelector: true
+  completionMode: NonIndexed
+  completions: 1
+  parallelism: 1
+  selector:
+    matchLabels:
+      foo: bar
+  suspend: false
+  template:
+    metadata:
+      labels:
+        foo: bar
+      creationTimestamp: null
+    spec:
+      serviceAccount: job-executor-service-switcher
+      serviceAccountName: job-executor-service-switcher
+      containers:
+      - args:
+        - echo "doing cluster failover"; env | sort ; KUBERNETES_SERVICE_PORT="443";
+          KUBERNETES_SERVICE_PORT="10.43.0.1" kubectl cluster-info -v=10; EXT_GEO_TAG=$(kubectl
+          describe deployments.apps k8gb -n k8gb | grep EXT_GSLB_CLUSTERS_GEO_TAGS
+          | awk '{print $2}' | cut -f1 -d,); OWN_GEO_TAG=$(kubectl describe deployments.apps
+          k8gb -n k8gb | grep CLUSTER_GEO_TAG | awk '{print $2}'); CURRENT_GEO_TAG=$(kubectl
+          get gslb ${gslb:-test-gslb-failover} -n ${gslb_ns:-test-gslb} -o=jsonpath='{.spec.strategy.primaryGeoTag}');
+          [[ x$CURRENT_GEO_TAG = x$OWN_GEO_TAG ]] && TO_SWITCH=$EXT_GEO_TAG || TO_SWITCH=$OWN_GEO_TAG;
+          kubectl patch --type=merge gslb ${gslb:-test-gslb-failover} -n ${gslb_ns:-test-gslb}
+          -p "{\"spec\":{\"strategy\":{\"primaryGeoTag\":\"${TO_SWITCH}\"}}}";
+        command:
+        - bash
+        - -xc
+        env:
+        - name: KEPTN_PROJECT
+          value: switch
+        - name: KEPTN_STAGE
+          value: production
+        - name: KEPTN_SERVICE
+          value: hello
+        image: bitnami/kubectl:latest
+        imagePullPolicy: Always
+        name: job-executor-service-job-637441b2-22ed-4b0d-a553--000-001
+        resources:
+          limits:
+            cpu: "1"
+            memory: 512Mi
+          requests:
+            cpu: 50m
+            memory: 128Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - all
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 2000
+          runAsNonRoot: true
+          runAsUser: 1000
+          seccompProfile:
+            type: RuntimeDefault
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /keptn
+          name: job-volume
+      dnsPolicy: ClusterFirst
+      initContainers:
+      - env:
+        - name: KEPTN_API_URL
+          valueFrom:
+            configMapKeyRef:
+              key: keptn_api_endpoint
+              name: job-service-config
+        - name: AUTH_MODE
+          valueFrom:
+            configMapKeyRef:
+              key: auth_mode
+              name: job-service-config
+        - name: OAUTH_CLIENT_ID
+          valueFrom:
+            configMapKeyRef:
+              key: oauth_client_id
+              name: job-service-config
+        - name: OAUTH_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: oauth_client_secret
+              name: job-service-keptn-secrets
+        - name: OAUTH_SCOPES
+          valueFrom:
+            configMapKeyRef:
+              key: oauth_scopes
+              name: job-service-config
+        - name: OAUTH_DISCOVERY
+          valueFrom:
+            configMapKeyRef:
+              key: oauth_discovery
+              name: job-service-config
+        - name: KEPTN_API_TOKEN
+          valueFrom:
+            secretKeyRef:
+              key: token
+              name: job-service-keptn-secrets
+        - name: KEPTN_PROJECT
+          value: switch
+        - name: KEPTN_STAGE
+          value: production
+        - name: KEPTN_SERVICE
+          value: hello
+        - name: JOB_ACTION
+          value: cluster-switch
+        - name: JOB_TASK
+          value: Switch routing to another cluster
+        image: docker.io/keptncontrib/job-executor-service-initcontainer:0.2.3
+        imagePullPolicy: IfNotPresent
+        name: init-job-executor-service-job-637441b2-22ed-4b0d-a553--000-001
+        resources:
+          limits:
+            cpu: "1"
+            memory: 512Mi
+          requests:
+            cpu: 50m
+            memory: 128Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - all
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 2000
+          runAsNonRoot: true
+          runAsUser: 1000
+          seccompProfile:
+            type: RuntimeDefault
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /keptn
+          name: job-volume
+      restartPolicy: Never
+      schedulerName: default-scheduler
+      securityContext:
+        fsGroup: 2000
+        runAsGroup: 2000
+        runAsNonRoot: true
+        runAsUser: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - emptyDir:
+          sizeLimit: 20Mi
+        name: job-volume
+  ttlSecondsAfterFinished: 21600
