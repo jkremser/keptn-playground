@@ -64,13 +64,13 @@ helm upgrade -i job-executor-service https://github.com/keptn-contrib/job-execut
 ```
 
 # create project and link it with git repo
-keptn create project switch -y -s docs/example/shipyard.yaml --git-user=jkremser --git-token=$GH_TOKEN --git-remote-url=https://github.com/jkremser/cluster-switch-action
+keptn create project switch -y -s manifests/shipyard.yaml --git-user=jkremser --git-token=$GH_TOKEN --git-remote-url=https://github.com/jkremser/cluster-switch-action
 
 # create service
 keptn create service hello --project switch -y
 
 # add the resource to the service
-keptn add-resource --project switch --service hello --stage production --resource docs/example/switch.yaml --resourceUri job/config.yaml
+keptn add-resource --project switch --service hello --stage production --resource manifests/switch.yaml --resourceUri job/config.yaml
 
 
 # rbac (cruding gslbs and deployments should be enough)
